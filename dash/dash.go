@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 var MACs = map[string]string{
@@ -30,7 +31,11 @@ func main() {
 
 	s := bufio.NewScanner(stdout)
 	s.Split(bufio.ScanLines)
+	var lastARP = time.Date(1980, 1, 6, 0, 0, 0, 0, time.UTC) //in case more than one interface is connected
 	for s.Scan() {
+		if lastARP.Add(10 * time.Second).After(time.Now()) {
+			continue
+		}
 		l := s.Text()
 		isProbe := strings.Contains(l, "0.0.0.0")
 		if isProbe {
@@ -42,6 +47,7 @@ func main() {
 					if err != nil {
 						fmt.Errorf("err: %s", err)
 					}
+					lastARP = time.Now()
 					break MAC
 				}
 
