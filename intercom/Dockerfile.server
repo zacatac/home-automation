@@ -1,0 +1,3 @@
+FROM scratch
+COPY bin/server /bin/server
+CMD ["/bin/server"]
